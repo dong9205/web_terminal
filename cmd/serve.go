@@ -6,6 +6,7 @@ package cmd
 import (
 	"fmt"
 
+	"github.com/dong9205/web_terminal/pkg/serve"
 	"github.com/spf13/cobra"
 )
 
@@ -14,8 +15,9 @@ var serveCmd = &cobra.Command{
 	Use:   "serve",
 	Short: "服务启动",
 	Long:  `启动webterminal服务`,
-	Run: func(cmd *cobra.Command, args []string) {
+	RunE: func(cmd *cobra.Command, args []string) error {
 		fmt.Println("serve called")
+		return serve.Run()
 	},
 }
 

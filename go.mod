@@ -3,6 +3,7 @@ module github.com/dong9205/web_terminal
 go 1.22.3
 
 require (
+	github.com/gorilla/websocket v1.5.1
 	github.com/spf13/cobra v1.8.0
 	k8s.io/api v0.30.1
 	k8s.io/client-go v0.30.1
@@ -21,7 +22,6 @@ require (
 	github.com/google/gnostic-models v0.6.8 // indirect
 	github.com/google/gofuzz v1.2.0 // indirect
 	github.com/google/uuid v1.3.0 // indirect
-	github.com/gorilla/websocket v1.5.1 // indirect
 	github.com/imdario/mergo v0.3.6 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/josharian/intern v1.0.0 // indirect
