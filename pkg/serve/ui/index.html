@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8" />
+  <!-- <meta name="viewport" content="width=device-width, initial-scale=1" /> -->
+  <title>Document</title>
+  <style>
+    .main {
+      display: flex;
+      justify-content: center;
+    }
+
+    .item {
+      width: 200px;
+      height: 100px;
+      background-color: rgb(131, 131, 131);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 10px;
+      font-weight: 600;
+      margin: 12px;
+      border: 1px solid rgb(32, 32, 32);
+      border-radius: 4px;
+    }
+
+    .item:hover {
+      transform: translateY(-4px);
+      background-color: rgb(208, 202, 202);
+      cursor: pointer;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="main">
+    <div class="item" onclick="window.location.assign('pod_log.html')">日志</div>
+    <div class="item" onclick="window.location.assign('pod_login.html')">登录</div>
+  </div>
+</body>
+
+</html>

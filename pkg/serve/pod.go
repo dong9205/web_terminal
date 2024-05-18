@@ -65,7 +65,7 @@ func PodTerminalLogin(w http.ResponseWriter, r *http.Request) {
 	if err := term.ReadReq(req); err != nil {
 		term.Failed(err)
 	}
-	log.Printf(`watch log req %v\n`, req)
+	log.Printf(`watch login req %v\n`, req)
 	// 获取Kubernetes客户端
 	k8sClient, err := k8s.NewClientFormFile2("/root/.kube/config", "kind-cluster01")
 	if err != nil {

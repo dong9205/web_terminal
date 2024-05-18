@@ -104,7 +104,6 @@ func (t *WebSocketTerminal) HandleCmd(m []byte) {
 			return
 		}
 		t.SetSize(*payload)
-		log.Printf(`resize add to queue success: %s\n`, req)
 		return
 	}
 	// 处理自定义命令
