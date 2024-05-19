@@ -2,6 +2,7 @@ package serve
 
 import (
 	"context"
+	"errors"
 	"io"
 	"log"
 	"net/http"
@@ -75,4 +76,38 @@ func PodTerminalLogin(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		term.Failed(err)
 	}
+}
+
+func PodList(w http.ResponseWriter, r *http.Request) {
+	// 读取请求参数解析到结构体
+	req := k8s.NewPodListRequest()
+	if err := r.ParseForm(); err != nil {
+		response(w, http.StatusBadRequest, nil, err)
+		return
+	}
+	req.Namespace = r.Form.Get("namespace")
+	if req.Namespace == "" {
+		response(w, http.StatusBadRequest, nil, errors.New("namespace is required"))
+		return
+	}
+	// 获取Kubernetes客户端
+	k8sClient, err := k8s.NewClientFormFile2("/root/.kube/config", "kind-cluster01")
+	if err != nil {
+		response(w, http.StatusInternalServerError, nil, err)
+		return
+	}
+	pods, err := k8sClient.PodList(r.Context(), req)
+	if err != nil {
+		response(w, http.StatusInternalServerError, nil, err)
+		return
+	}
+	var podListResp map[string][]string = make(map[string][]string)
+	for _, pod := range pods.Items {
+		podList := make([]string, 0)
+		for _, container := range pod.Spec.Containers {
+			podList = append(podList, container.Name)
+		}
+		podListResp[pod.Name] = podList
+	}
+	response(w, http.StatusOK, podListResp, nil)
 }

@@ -5,15 +5,24 @@
     <link rel="stylesheet" href="node_modules/@xterm/xterm/css/xterm.css" />
     <script src="node_modules/@xterm/xterm/lib/xterm.js"></script>
     <script src="node_modules/@xterm/addon-fit/lib/addon-fit.js"></script>
-    <script src="./term.js"></script>
+    <!-- <script src="./term.js"></script> -->
     <title>查看日志</title>
 </head>
 
 <body>
     <div style="margin: 8;padding: 0;">
-        <span>Namespace: <input name="namespace" type="text" value="default" /></span>
-        <span>PodName: <input name="pod_name" type="text" value="nginx-7854ff8877-6wg2h" /></span>
-        <span>Container Name: <input name="container_name" type="text" value="nginx" /></span>
+        <!-- <span>Namespace: <input name="namespace" type="text" value="default" /></span> -->
+        <span>Namespace:
+            <select name="s_namespace"></select>
+        </span>
+        <!-- <span>PodName: <input name="pod_name" type="text" value="nginx-7854ff8877-6wg2h" /></span> -->
+        <span>PodName:
+            <select name="s_pod_name"></select>
+        </span>
+        <!-- <span>Container Name: <input name=" container_name" type="text" value="nginx" /></span> -->
+        <span>Container Name:
+            <select name="s_container_name"></select>
+        </span>
         <span><button onclick="connect()" id="connect">确认</button></span>
     </div>
     <div id="terminal" style="height: 95vh;"></div>
@@ -42,17 +51,78 @@
     //     }
     //     ws.send(JSON.stringify(dimensions))
     // }
-
+    const s_namespace = document.getElementsByName('s_namespace')[0]
+    fetch("http://127.0.0.1:9200/api/namespace/list").then(res => res.json()).then(data => {
+        switch (data.code) {
+            case 200:
+                for (let i = 0; i < data.data.length; i++) {
+                    const option = document.createElement('option')
+                    option.value = data.data[i]
+                    option.text = data.data[i]
+                    s_namespace.appendChild(option)
+                    if (i == 0) {
+                        s_namespace.dispatchEvent(new Event('change'))
+                        // Element.fireEvent(s_namespace, "onchange")
+                    }
+                }
+                break
+            default:
+                console.log(`get namespace list error ${data.err}`);
+        }
+    })
+    let podInfo = {}
+    const s_pod_name = document.getElementsByName('s_pod_name')[0]
+    s_namespace.onchange = (event) => {
+        fetch(`http://127.0.0.1:9200/api/pod/list?namespace=${event.target.value}`).then(res => res.json()).then(data => {
+            switch (data.code) {
+                case 200:
+                    podInfo = data.data
+                    // podInfo.forEach((containers, name) => {
+                    // 循环清空所有option
+                    while (s_pod_name.options.length > 0) {
+                        s_pod_name.remove(0);
+                    }
+                    for (let [name, value] of Object.entries(podInfo)) {
+                        const option = document.createElement('option')
+                        option.value = name
+                        option.text = name
+                        s_pod_name.appendChild(option)
+                    }
+                    s_pod_name.dispatchEvent(new Event('change'))
+                    break
+                default:
+                    console.log(`get pods list error ${data.err}`);
+            }
+        })
+    }
+    const s_container_name = document.getElementsByName('s_container_name')[0]
+    s_pod_name.onchange = (event) => {
+        const containers = podInfo[event.target.value];
+        if (containers !== undefined) {
+            while (s_container_name.options.length > 0) {
+                s_container_name.remove(0);
+            }
+            for (let i = 0; i < containers.length; i++) {
+                const option = document.createElement('option')
+                option.value = containers[i]
+                option.text = containers[i]
+                s_container_name.appendChild(option)
+            }
+        }
+    }
     const connBtn = document.getElementById('connect')
     const connect = () => {
         // 连接websocket服务器
         let socket = new WebSocket(`ws://127.0.0.1:9200/ws/pod/terminal/log`)
 
         // 建立连接后发送请求
-        const inputs = document.getElementsByTagName('input')
-        const namespace = inputs['namespace'].value
-        const pod_name = inputs['pod_name'].value
-        const container_name = inputs['container_name'].value
+        // const inputs = document.getElementsByTagName('input')
+        // const namespace = inputs['namespace'].value
+        const namespace = s_namespace.value
+        // const pod_name = inputs['pod_name'].value
+        const pod_name = s_pod_name.value
+        // const container_name = inputs['container_name'].value
+        const container_name = s_container_name.value
         window.onresize = function () {
             fitAddon.fit();
             // sendRowsAndCols(socket);

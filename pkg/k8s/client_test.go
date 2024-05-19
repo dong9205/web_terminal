@@ -63,3 +63,27 @@ func TestLoginContainer(t *testing.T) {
 		t.Fatal(err)
 	}
 }
+
+func TestNamespaceList(t *testing.T) {
+	client := setup()
+	req := k8s.NewNamespaceListRequest()
+	nss, err := client.NamespaceList(context.Background(), req)
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _,ns := range nss.Items{
+		t.Log(ns.Name)
+	}
+}
+func TestPodList(t *testing.T) {
+	client := setup()
+	req := k8s.NewPodListRequest()
+	req.Namespace = "default"
+	pods, err := client.PodList(context.Background(), req)
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _,pod := range pods.Items{
+		t.Log(pod.Name)
+	}
+}

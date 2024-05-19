@@ -1,2 +1,4 @@
 web_terminal
 **/ui/node_modules/**
+.vscode/**
+__debug_bin**
